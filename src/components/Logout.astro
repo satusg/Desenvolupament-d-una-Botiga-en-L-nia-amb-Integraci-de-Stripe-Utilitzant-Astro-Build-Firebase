@@ -1,0 +1,30 @@
+---
+import { auth } from "@/firebase/config";
+const { currentUser } = auth;
+const { isAnonymous } = currentUser;
+---
+
+{
+  (currentUser && !isAnonymous) && (
+    <form id="logoutForm">
+  <button type="button">Logout</button>
+
+  <script>
+    import Axios from "axios";
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("logoutForm") as HTMLFormElement;
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        Axios.post("/api/logout.json").then((response) => {
+          if (response.status === 200) {
+            window.location.href = "/";
+          } else {
+            console.log(response);
+          }
+        });
+      });
+    });
+  </script>
+</form>
+  )
+}
