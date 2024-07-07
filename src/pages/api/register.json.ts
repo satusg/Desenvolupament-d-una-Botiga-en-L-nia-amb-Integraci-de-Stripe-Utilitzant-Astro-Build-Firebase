@@ -68,6 +68,15 @@ export const POST: APIRoute = async ({ params, request }) => {
             }), {
                 headers: { 'content-type': 'application/json' },
             });
+        }else if (error.code === 'auth/weak-password') { 
+            return new Response(JSON.stringify({
+                error: {
+                    message: 'Password is too weak, it should be at least 6 characters long.',
+                    field: 'password',
+                },
+            }), {
+                headers: { 'content-type': 'application/json' },
+            });
         }
         console.log(error);
         return new Response(JSON.stringify({
