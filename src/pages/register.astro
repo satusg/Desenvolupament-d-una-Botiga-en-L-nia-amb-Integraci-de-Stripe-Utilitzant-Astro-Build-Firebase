@@ -1,6 +1,11 @@
 ---
 // Missing remove the default values form input fields
+import { auth } from "@/firebase/config";
+if (auth.currentUser && !auth.currentUser.isAnonymous) {
+  return Astro.redirect("/");
+}
 ---
+
 <body>
   <main>
     <h1>Register</h1>
@@ -69,7 +74,6 @@
       });
     });
     document.querySelector("button").addEventListener("click", async () => {
-      const form = document.querySelector("form");
       if (form.checkValidity() === false) {
         form.reportValidity();
         return;

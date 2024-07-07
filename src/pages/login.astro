@@ -1,5 +1,9 @@
 ---
 // Missing remove the default values form input fields
+import { auth } from "@/firebase/config";
+if (auth.currentUser && !auth.currentUser.isAnonymous) {
+  return Astro.redirect("/");
+}
 ---
 
 <body>
@@ -28,36 +32,40 @@
   </main>
 </body>
 <script>
-  document.querySelector("button").addEventListener("click", async () => {
-    const form = document.getElementById("loginForm") as HTMLFormElement;
-    const formData = new FormData(form);
-    const response = await fetch(form.action, {
-      method: form.method,
-      body: formData,
-    });
-    const data = await response.json();
-    if (!response.ok || data.error) {
-      if (data?.error?.field) {
-        const errorField = document.querySelector(
-          `[name="${data.error.field}"]`
-        );
-        const inputField = errorField as HTMLInputElement;
-        inputField.setCustomValidity(data?.error?.message || "Invalid input");
-        inputField.reportValidity();
-        errorField.addEventListener("input", () => {
-          inputField.setCustomValidity("");
-          inputField?.removeEventListener("input", () => {});
-        });
+  import Axios from "axios";
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form");
+    document.querySelector("button").addEventListener("click", async () => {
+      if (form.checkValidity() === false) {
+        form.reportValidity();
         return;
       }
-      alert(
-        data?.error?.message ||
-          "An unexpected error has occurred, please retry later"
-      );
-      return;
-    }
-    alert("User logged in successfully");
-    window.location.href = "/account";
+      const formData = new FormData(form);
+      const response = await Axios.post(form.action, formData);
+      const data = response.data;
+      if (!data || data.error) {
+        if (data?.error?.field) {
+          const errorField = document.querySelector(
+            `[name="${data.error.field}"]`
+          );
+          const inputField = errorField as HTMLInputElement;
+          inputField.setCustomValidity(data?.error?.message || "Invalid input");
+          inputField.reportValidity();
+          errorField.addEventListener("input", () => {
+            inputField.setCustomValidity("");
+            inputField?.removeEventListener("input", () => {});
+          });
+          return;
+        }
+        alert(
+          data?.error?.message ||
+            "An unexpected error has occurred, please retry later"
+        );
+        return;
+      }
+      alert("User logged in successfully");
+      window.location.href = "/account";
+    });
   });
 </script>
 <style>
