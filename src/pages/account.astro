@@ -1,0 +1,16 @@
+---
+// Check whether the user is logged in using firebase
+import { auth } from "@/firebase/config";
+if (!auth.currentUser || auth.currentUser.isAnonymous) {
+  // If the user is logged in, redirect to the dashboard
+  return Astro.redirect("/");
+}
+const { displayName, email } = auth.currentUser;
+---
+
+<body>
+  <main>
+    <h1>Account</h1>
+    <p>Welcome, {displayName || email}!</p>
+  </main>
+</body>
