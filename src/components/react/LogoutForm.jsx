@@ -1,6 +1,7 @@
 import Axios from 'axios';
 export const LogoutForm = () => { 
-    const onSumbitHandler = () => {
+    const onSumbitHandler = (event) => {
+        event.preventDefault();
         Axios.post('/api/logout.json', {
         }).then((response) => {
             if (response.status === 200) {
