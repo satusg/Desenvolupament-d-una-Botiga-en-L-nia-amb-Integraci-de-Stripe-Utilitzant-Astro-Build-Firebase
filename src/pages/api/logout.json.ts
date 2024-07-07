@@ -1,7 +1,7 @@
 import { type APIRoute } from "astro";
 import { auth } from "@/firebase/config";
-export const GET: APIRoute = async({ params, request }) => { 
-    if(auth.currentUser && !auth.currentUser.isAnonymous){
+export const POST: APIRoute = async({ params, request }) => { 
+    if(auth.currentUser && !auth.currentUser?.isAnonymous){
         await auth.signOut();
         return new Response(JSON.stringify({
             message: 'User logged out successfully',
