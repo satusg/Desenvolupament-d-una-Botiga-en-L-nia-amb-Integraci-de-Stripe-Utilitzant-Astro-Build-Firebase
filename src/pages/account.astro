@@ -6,10 +6,12 @@ if (!auth.currentUser || auth.currentUser.isAnonymous) {
   return Astro.redirect("/");
 }
 const { displayName, email } = auth.currentUser;
+import Logout from "@/components/Authentication.astro";
 ---
 
 <body>
   <main>
+    <Logout />
     <h1>Account</h1>
     <p>Welcome, {displayName || email}!</p>
   </main>
