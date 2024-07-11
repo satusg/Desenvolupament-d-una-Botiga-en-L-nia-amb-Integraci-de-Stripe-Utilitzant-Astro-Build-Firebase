@@ -27,6 +27,12 @@ if (auth.currentUser && !auth.currentUser.isAnonymous) {
         required
       />
       <button type="button">Login</button>
+      <button
+        type="button"
+        onclick="window.location.href = '/loginGoogle';return false;"
+      >
+        Login with Google
+      </button>
       <p id="error" style="display:none;"></p>
     </form>
   </main>
