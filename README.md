@@ -185,3 +185,8 @@ export const GET: APIRoute = async ({ params, request }) => {
 
 # Compilem el nostre projecte
 pnpm run build
+
+# Afegim firebase-admin al nostre projecte per tal de realitzar la conexió a la base de dades.
+Creem el fitxer serviceAccountKey.json i afegim la clau secreta que obtenim desde la configuració del nostre projecte, després dirigint-nos a comptes de servei i a l'apartat de SDK de Firebase Admin generem la nostra clau secreta.
+# Creem el fitxer src/firebase/admin.js on importem i declarem firebase-admin
+

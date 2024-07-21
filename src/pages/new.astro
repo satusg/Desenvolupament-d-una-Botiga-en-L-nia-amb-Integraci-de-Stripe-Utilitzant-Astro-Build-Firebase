@@ -1,0 +1,32 @@
+---
+/**
+import { auth } from "@/firebase/config";
+if (!auth.currentUser || auth.currentUser.isAnonymous) {
+  // If the user is logged in, redirect to the dashboard
+  return Astro.redirect("/");
+}**/
+import admin from "@/firebase/admin";
+
+const db = admin.firestore();
+console.log(db);
+
+async function initializeCollections() {
+  const sampleProduct = {
+    name: "Sample Product",
+    description: "A description of the sample product",
+    price: 19.99,
+    categories: ["Sample Category"],
+    images: ["url-to-image.jpg"],
+  };
+
+  try {
+    // Adding a sample product to 'products' collection
+    await db.collection("products").doc("sampleProductId").set(sampleProduct);
+    console.log("Sample product added successfully");
+  } catch (error) {
+    console.error("Error initializing collections:", error);
+  }
+}
+
+initializeCollections();
+---
