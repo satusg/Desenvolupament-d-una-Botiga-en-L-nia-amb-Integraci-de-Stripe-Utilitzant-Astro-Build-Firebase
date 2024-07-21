@@ -190,3 +190,4 @@ pnpm run build
 Creem el fitxer serviceAccountKey.json i afegim la clau secreta que obtenim desde la configuració del nostre projecte, després dirigint-nos a comptes de servei i a l'apartat de SDK de Firebase Admin generem la nostra clau secreta.
 # Creem el fitxer src/firebase/admin.js on importem i declarem firebase-admin
 
+# Important al canviar el nom de la base de dades de Firestore a un altre cal tenir-hon en compte al inicialitzar la conexió a aquesta ja que sino retorna un error 5 que no es massa ilustratiu.

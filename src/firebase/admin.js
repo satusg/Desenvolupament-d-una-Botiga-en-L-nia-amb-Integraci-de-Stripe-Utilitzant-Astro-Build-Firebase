@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+
 import serviceAccount from 'serviceAccountKey.json';
 
 if (admin.apps.length === 0) {
@@ -8,3 +9,5 @@ if (admin.apps.length === 0) {
 }
 
 export default admin; 
+// export function to get the firestore current timestamp
+export const timestamp = () => admin.firestore.FieldValue.serverTimestamp();
