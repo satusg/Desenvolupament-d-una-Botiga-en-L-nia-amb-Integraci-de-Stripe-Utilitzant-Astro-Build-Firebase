@@ -1,6 +1,5 @@
 import { type APIRoute } from "astro";
 import admin from "@/firebase/admin";
-import { C } from "dist/server/chunks/astro/assets-service_CR-gM4WY.mjs";
 
 /**
  * Function used to handle the GET request to retrieve the products from the database
