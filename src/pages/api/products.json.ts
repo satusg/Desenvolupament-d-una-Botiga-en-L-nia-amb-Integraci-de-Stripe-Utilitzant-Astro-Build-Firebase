@@ -13,10 +13,12 @@ export const GET: APIRoute = async ({ params, request }) => {
     const url = new URL(request.url);
     const urlParams = url.searchParams;
     const productsRef = db.collection("products");
-    const limit = Math.max(
-      Math.min(parseInt(urlParams.get("limit") || "10"), 100),
-      10
-    ); // limiting the number of total products to 100
+    const limit = Math.min(
+      Math.max(parseInt(urlParams.get("limit") || "1"), 1),
+      100
+    );
+
+    console.log(limit);
     let productsQuery = productsRef.orderBy("createdAt").limit(limit);
     let nextUrl = null;
     let prevUrl = null;
@@ -34,7 +36,20 @@ export const GET: APIRoute = async ({ params, request }) => {
             e.message
         );
       }
+    } else if (urlParams.has("first")) {
+      try {
+        const firstDoc = await productsRef.doc(urlParams.get("first")).get();
+        if (firstDoc.exists) {
+          productsQuery = productsQuery.endBefore(firstDoc).limitToLast(limit);
+        }
+      } catch (e) {
+        console.log(
+          "An error has occurred while trying to get the first document. Error:" +
+            e.message
+        );
+      }
     }
+    // Handle the pagination for the previous page
 
     const productsSnapshot = await productsQuery.get();
     const productsData = productsSnapshot.docs.map((doc) => ({
@@ -57,8 +72,11 @@ export const GET: APIRoute = async ({ params, request }) => {
           .orderBy("createdAt")
           .endBefore(firstDoc)
           .limitToLast(1);
+
         const previousSnapshot = await previousQuery.get();
+
         if (!previousSnapshot.empty) {
+          console.log(previousSnapshot.docs[0].id);
           prevUrl = `${url.origin}${url.pathname}?limit=${limit}&first=${firstDoc.id}`;
         }
       } catch (e) {

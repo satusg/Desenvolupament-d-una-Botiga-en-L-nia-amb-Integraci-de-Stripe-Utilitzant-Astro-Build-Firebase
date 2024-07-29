@@ -191,3 +191,5 @@ Creem el fitxer serviceAccountKey.json i afegim la clau secreta que obtenim desd
 # Creem el fitxer src/firebase/admin.js on importem i declarem firebase-admin
 
 # Important al canviar el nom de la base de dades de Firestore a un altre cal tenir-hon en compte al inicialitzar la conexió a aquesta ja que sino retorna un error 5 que no es massa ilustratiu.
+
+# Instalem zustand per tal de gestionar el contexte entre els diferents elements. 
