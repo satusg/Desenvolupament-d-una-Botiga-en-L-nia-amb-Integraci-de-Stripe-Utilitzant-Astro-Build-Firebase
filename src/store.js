@@ -45,9 +45,27 @@ const useProductsStore = create((set, get) => ({
 const useCartStore = create((set, get) => ({
     cart: [],
     // Add a product to the cart
-    addToCart: (product) => {
-        set({ cart: [...get().cart, product] });
-    },
+  addToCart: (product) => {
+    const previousCart = get().cart;
+    
+    // Optimistically update the cart first
+    set(state => ({ cart: [...state.cart, product] }));
+
+    // Perform the Axios POST request
+    axios.post('https://localhost:3000/api/cart/add.json', {
+      product,
+      quantity: 1
+    })
+    .then(response => {
+      // You might update the state based on the response if needed
+      // For now, we assume the optimistic update is correct and do nothing
+    })
+    .catch(error => {
+      console.error('Error adding product to cart:', error);
+      // Revert to the previous state in case of an error
+      set({ cart: previousCart });
+    });
+  },
     // Remove a product from the cart
     removeFromCart: (product) => {
         set({ cart: get().cart.filter((p) => p.id !== product.id) });
