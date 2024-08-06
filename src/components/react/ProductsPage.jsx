@@ -1,13 +1,17 @@
 import React, { useEffect } from 'react';
 import { useProductsStore } from '@/store.js';
 import Product from './Product';
+import { useCartStore } from '../../store';
 
 export const ProductsPage = () => {
   const { products, nextUrl, prevUrl, loadInitialProducts, fetchNext, fetchPrevious } = useProductsStore();
-
+  const { loadInitialCart, initialLoad } = useCartStore();
   useEffect(() => {
-    loadInitialProducts();
+      loadInitialProducts();
   }, [loadInitialProducts]);
+  useEffect(() => {
+    loadInitialCart();
+  }, []);
 
     return (
       <div>

@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
+import { init } from 'astro/virtual-modules/prefetch.js';
 
 // Define the product list management
 const useProductsStore = create((set, get) => ({
@@ -43,13 +44,24 @@ const useProductsStore = create((set, get) => ({
   }
 }));
 const useCartStore = create((set, get) => ({
-    cart: [],
+  cart: {},
+  initialLoad: false,
     // Add a product to the cart
   addToCart: (product) => {
     const previousCart = get().cart;
     
     // Optimistically update the cart first
-    set(state => ({ cart: [...state.cart, product] }));
+    set(state => {
+      console.log(state);
+        return {
+            cart: {
+                ...state.cart,
+                [product.id]: {
+                    ...product,
+                    quantity: state.cart[product.id] ? state.cart[product.id].quantity + 1 : 1 
+                }
+            }
+}});
 
     // Perform the Axios POST request
     axios.post('https://localhost:3000/api/cart/add.json', {
@@ -59,6 +71,9 @@ const useCartStore = create((set, get) => ({
     .then(response => {
       // You might update the state based on the response if needed
       // For now, we assume the optimistic update is correct and do nothing
+      if (response) { 
+        console.log('Product added to cart:', response.data);
+      }
     })
     .catch(error => {
       console.error('Error adding product to cart:', error);
@@ -68,19 +83,45 @@ const useCartStore = create((set, get) => ({
   },
     // Remove a product from the cart
     removeFromCart: (product) => {
-        set({ cart: get().cart.filter((p) => p.id !== product.id) });
+        set(state => {
+          const newCart = {...state.cart};
+          delete newCart[product.id];
+          return { cart: newCart };
+        });
     },
     // Clear the cart
     clearCart: () => {
-        set({ cart: [] });
+      set({ cart: {} });
     },
     // Get the total price of the cart
     getTotalPrice: () => {
-        return get().cart.reduce((total, product) => total + product.price, 0);
+        return Object.values(get().cart).reduce((total, item) => total + (item.price * item.quantity), 0);
     },
     // Check whether the product is on the cart
-    onCart: (product) => {
-        return get().cart.some((p) => p.id === product.id);
-    }
+  onCart: (product) => {
+    console.log(product, 'productId');
+
+    return Boolean(get().cart[product.id]);
+  },
+  loadCart: async () => {
+    await axios.get('https://localhost:3000/api/cart/get.json')
+    .then(response => {
+      set({ cart: response.data?.products ?? {} });
+    })
+    .catch(error => {
+      console.error('Failed to load cart:', error);
+    });
+  },
+  loadInitialCart: () => { 
+    if(get().initialLoad) return;
+    axios.get('https://localhost:3000/api/cart/get.json')
+    .then(response => {
+      set({ cart: response.data?.products ?? {} });
+      initialLoad = true;
+    })
+    .catch(error => {
+      console.error('Failed to load cart:', error);
+    });
+  }
 }));
 export { useCartStore,useProductsStore };

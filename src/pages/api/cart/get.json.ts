@@ -3,21 +3,12 @@ import { getCurrentUser, authenticateForCart } from "@/utils/authentication";
 import admin from "@/firebase/admin";
 
 export const GET: APIRoute = async ({ params, request }) => {
-  return new Response(
-    JSON.stringify({
-      currentUser: getCurrentUser(),
-      message: "User logged out successfully",
-    }),
-    {
+  if (getCurrentUser() === null) {
+    return new Response(JSON.stringify({ products: {} }), {
       headers: { "content-type": "application/json" },
-    }
-  );
-};
-export const POST: APIRoute = async ({ params, request }) => {
+    });
+  }
   const user = await authenticateForCart();
-  const requestBody = await request.json();
-  const { product, quantity } = requestBody;
-
   try {
     if (user?.uid === null || user?.uid === undefined) {
       throw new Error("User has not been authenticated");
@@ -28,24 +19,16 @@ export const POST: APIRoute = async ({ params, request }) => {
     // Check if the document exists, create if not
     const doc = await cartRef.get();
     if (!doc.exists) {
-      await cartRef.set({}); // Initialize with an empty object or default values
+      return new Response(JSON.stringify({ products: {} }), {
+        headers: { "content-type": "application/json" },
+      });
     }
-
-    await cartRef.set(
-      {
-        [product.id]: {
-          ...product,
-          quantity,
-        },
-      },
-      { merge: true }
-    ); // Utiliza merge para actualizar solo los campos específicos
+    const cart = doc.data();
 
     return new Response(
       JSON.stringify({
-        currentUser: user,
-        request: requestBody,
-        message: "Product added to cart successfully",
+        products: cart,
+        message: "Products retrived from the cart successfully",
       }),
       {
         status: 200,
@@ -57,8 +40,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     return new Response(
       JSON.stringify({
         currentUser: user,
-        request: requestBody,
-        message: "Error adding product to cart",
+        message: "Error retriving products from the cart",
         error: e.message,
       }),
       {
