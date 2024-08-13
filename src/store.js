@@ -81,14 +81,37 @@ const useCartStore = create((set, get) => ({
       set({ cart: previousCart });
     });
   },
-    // Remove a product from the cart
-    removeFromCart: (product) => {
-        set(state => {
+    
+  removeFromCart: (product, quantity) => {
+    const previousCart = get().cart;
+    
+    // Optimistically delete the product from the cart first
+    set(state => {
           const newCart = {...state.cart};
           delete newCart[product.id];
           return { cart: newCart };
         });
-    },
+
+    // Perform the Axios POST request
+    axios.post('https://localhost:3000/api/cart/delete.json', {
+      product,
+      quantity: quantity || 1
+      
+    })
+    .then(response => {
+      // You might update the state based on the response if needed
+      // For now, we assume the optimistic update is correct and do nothing
+      if (response) { 
+        console.log('Product delete from the cart:', response.data);
+      }
+    })
+    .catch(error => {
+      console.error('Error removing the product from the cart:', error);
+      // Revert to the previous state in case of an error
+      set({ cart: previousCart });
+    });
+  },
+    
     // Clear the cart
     clearCart: () => {
       set({ cart: {} });
