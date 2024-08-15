@@ -5,7 +5,7 @@ import admin from "@/firebase/admin";
 export const POST: APIRoute = async ({ params, request }) => {
   const user = await authenticateForCart();
   const requestBody = await request.json();
-  const { product, quantity } = requestBody;
+  const { product, quantity, all } = requestBody;
 
   try {
     // Verificación de autenticación del usuario
@@ -20,8 +20,6 @@ export const POST: APIRoute = async ({ params, request }) => {
     if (!doc.exists) {
       return new Response(
         JSON.stringify({
-          currentUser: user,
-          request: requestBody,
           message: "Cart not found",
         }),
         {
@@ -30,16 +28,36 @@ export const POST: APIRoute = async ({ params, request }) => {
         }
       );
     }
-
-    // Obtener los datos del carrito
-    const cartData = doc.data();
-
-    // Verificar si el producto existe en el carrito
-    if (!cartData || !cartData[product.id]) {
+    if (all === true) {
+      await cartRef.delete();
       return new Response(
         JSON.stringify({
-          currentUser: user,
-          request: requestBody,
+          message: "Cart deleted successfully",
+        }),
+        {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        }
+      );
+    }
+    // Obtener los datos del carrito
+    const cartData = doc.data();
+    if (!cartData) {
+      return new Response(
+        JSON.stringify({
+          message: "Cart is empty",
+        }),
+        {
+          status: 404,
+          headers: { "content-type": "application/json" },
+        }
+      );
+    }
+    // Verificar si el producto existe en el carrito
+
+    if (!cartData?.products?.[product.id]) {
+      return new Response(
+        JSON.stringify({
           message: "Product not found in cart",
         }),
         {
@@ -48,22 +66,25 @@ export const POST: APIRoute = async ({ params, request }) => {
         }
       );
     }
-
-    // Manejo de la cantidad del producto
-
-    if (cartData[product.id].quantity - quantity <= 0) {
-      delete cartData[product.id];
+    // recalculate the total
+    cartData.total -=
+      (cartData.products[product.id]?.price || 0) *
+      (cartData.products[product.id]?.quantity || 0);
+    // Actualizar la cantidad del producto
+    if (cartData.products[product.id].quantity - quantity <= 0) {
+      delete cartData.products[product.id];
     } else {
-      cartData[product.id].quantity -= quantity;
+      cartData.products[product.id].quantity -= quantity;
     }
-
+    // recalculate the total
+    cartData.total +=
+      (cartData.products[product.id]?.price || 0) *
+      (cartData.products[product.id]?.quantity || 0);
     // Actualizar el carrito en Firestore
     await cartRef.set(cartData);
 
     return new Response(
       JSON.stringify({
-        currentUser: user,
-        request: requestBody,
         message:
           quantity <= 0
             ? "Product removed from the cart successfully"
@@ -83,7 +104,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     );
     return new Response(
       JSON.stringify({
-        currentUser: user,
+        currentUser: user?.uid || "No user",
         request: requestBody,
         message: "Error updating the cart",
         error: e.message,

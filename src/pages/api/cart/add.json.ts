@@ -2,17 +2,6 @@ import { type APIRoute } from "astro";
 import { getCurrentUser, authenticateForCart } from "@/utils/authentication";
 import admin from "@/firebase/admin";
 
-export const GET: APIRoute = async ({ params, request }) => {
-  return new Response(
-    JSON.stringify({
-      currentUser: getCurrentUser(),
-      message: "User logged out successfully",
-    }),
-    {
-      headers: { "content-type": "application/json" },
-    }
-  );
-};
 export const POST: APIRoute = async ({ params, request }) => {
   const user = await authenticateForCart();
   const requestBody = await request.json();
@@ -25,21 +14,34 @@ export const POST: APIRoute = async ({ params, request }) => {
 
     const cartRef = admin.firestore().collection("carts").doc(`${user.uid}`);
 
-    // Check if the document exists, create if not
     const doc = await cartRef.get();
     if (!doc.exists) {
-      await cartRef.set({}); // Initialize with an empty object or default values
+      await cartRef.set({});
     }
 
+    const cartData = doc.data();
+    let total = 0;
+
+    for (const key in cartData) {
+      if (key !== "total") {
+        const item = cartData[key];
+        total += item.price * item.quantity;
+        console.log(item.price, item.quantity);
+      }
+    }
+    console.log(total);
     await cartRef.set(
       {
-        [product.id]: {
-          ...product,
-          quantity,
+        products: {
+          [product.id]: {
+            ...product,
+            quantity,
+          },
         },
+        total: total + product.price * quantity,
       },
       { merge: true }
-    ); // Utiliza merge para actualizar solo los campos específicos
+    );
 
     return new Response(
       JSON.stringify({

@@ -5,7 +5,7 @@ import { useCartStore } from '../../store';
 
 export const ProductsPage = () => {
   const { products, nextUrl, prevUrl, loadInitialProducts, fetchNext, fetchPrevious } = useProductsStore();
-  const { loadInitialCart, initialLoad } = useCartStore();
+  const { loadInitialCart } = useCartStore();
   useEffect(() => {
       loadInitialProducts();
   }, [loadInitialProducts]);

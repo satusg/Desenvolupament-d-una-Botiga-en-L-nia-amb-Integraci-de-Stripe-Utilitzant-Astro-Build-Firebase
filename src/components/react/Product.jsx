@@ -4,7 +4,6 @@ import { useCartStore } from '@/store.js';
 const Product = ({ product }) => {
     const { addToCart, removeFromCart, clearCart, cart, onCart  } = useCartStore();
     const onViewDetails = () => {
-        // Aquí ira el funcionamiento de las llamadas a backend para ver los detalles del producto.
         alert(`Viewing details of ${product.title}`);
     }
     const stock = product.stock > 0 ? 'In Stock' : 'Out of Stock';

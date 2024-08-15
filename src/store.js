@@ -1,6 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
-import { init } from 'astro/virtual-modules/prefetch.js';
+
 
 // Define the product list management
 const useProductsStore = create((set, get) => ({
@@ -45,15 +45,17 @@ const useProductsStore = create((set, get) => ({
 }));
 const useCartStore = create((set, get) => ({
   cart: {},
+  total: 0,
   initialLoad: false,
     // Add a product to the cart
   addToCart: (product) => {
     const previousCart = get().cart;
+    const previousTotal = get().total;
     
     // Optimistically update the cart first
     set(state => {
-      console.log(state);
-        return {
+      return {
+            total: state.total + product.price, 
             cart: {
                 ...state.cart,
                 [product.id]: {
@@ -61,7 +63,7 @@ const useCartStore = create((set, get) => ({
                     quantity: state.cart[product.id] ? state.cart[product.id].quantity + 1 : 1 
                 }
             }
-}});
+    }});
 
     // Perform the Axios POST request
     axios.post('https://localhost:3000/api/cart/add.json', {
@@ -78,18 +80,19 @@ const useCartStore = create((set, get) => ({
     .catch(error => {
       console.error('Error adding product to cart:', error);
       // Revert to the previous state in case of an error
-      set({ cart: previousCart });
+      set({ cart: previousCart, total: previousTotal });
     });
   },
     
   removeFromCart: (product, quantity) => {
     const previousCart = get().cart;
+    const previousTotal = get().total;
     
     // Optimistically delete the product from the cart first
     set(state => {
           const newCart = {...state.cart};
           delete newCart[product.id];
-          return { cart: newCart };
+          return { cart: newCart , total: state.total - (product.price * (quantity || 1)) };
         });
 
     // Perform the Axios POST request
@@ -108,28 +111,45 @@ const useCartStore = create((set, get) => ({
     .catch(error => {
       console.error('Error removing the product from the cart:', error);
       // Revert to the previous state in case of an error
-      set({ cart: previousCart });
+      set({ cart: previousCart, total: previousTotal });
     });
   },
     
     // Clear the cart
     clearCart: () => {
-      set({ cart: {} });
+      const previousCart = get().cart;
+      const previousTotal = get().total;
+      // Optimistically delete all the product from the cart
+      set({ cart: {}, total: 0 });
+      // Perform the Axios POST request
+    axios.post('https://localhost:3000/api/cart/delete.json', {
+      all: true
+    })
+      .then(response => {
+      // You might update the state based on the response if needed
+      // For now, we assume the optimistic update is correct and do nothing
+      if (response) { 
+        console.log('All the producrs have been deleted from the cart:', response.data);
+      }
+      })
+      .catch(error => {
+      console.error('Error removing all the products from the cart:', error);
+      // Revert to the previous state in case of an error
+      set({ cart: previousCart, total: previousTotal });
+      });
     },
     // Get the total price of the cart
     getTotalPrice: () => {
-        return Object.values(get().cart).reduce((total, item) => total + (item.price * item.quantity), 0);
+        return get().total;
     },
     // Check whether the product is on the cart
   onCart: (product) => {
-    console.log(product, 'productId');
-
     return Boolean(get().cart[product.id]);
   },
   loadCart: async () => {
     await axios.get('https://localhost:3000/api/cart/get.json')
     .then(response => {
-      set({ cart: response.data?.products ?? {} });
+      set({ cart: response.data?.products ?? {} , total: response.data?.total ?? 0 });
     })
     .catch(error => {
       console.error('Failed to load cart:', error);
@@ -139,8 +159,7 @@ const useCartStore = create((set, get) => ({
     if(get().initialLoad) return;
     axios.get('https://localhost:3000/api/cart/get.json')
     .then(response => {
-      set({ cart: response.data?.products ?? {} });
-      initialLoad = true;
+      set({ cart: response.data?.products ?? {}, total: response.data?.total ?? 0, initialLoad: true });
     })
     .catch(error => {
       console.error('Failed to load cart:', error);

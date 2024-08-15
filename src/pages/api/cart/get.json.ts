@@ -19,15 +19,17 @@ export const GET: APIRoute = async ({ params, request }) => {
     // Check if the document exists, create if not
     const doc = await cartRef.get();
     if (!doc.exists) {
-      return new Response(JSON.stringify({ products: {} }), {
+      return new Response(JSON.stringify({ products: {}, total: 0 }), {
         headers: { "content-type": "application/json" },
       });
     }
-    const cart = doc.data();
+    const products = doc.data().products;
+    const total = doc.data().total;
 
     return new Response(
       JSON.stringify({
-        products: cart,
+        products,
+        total,
         message: "Products retrived from the cart successfully",
       }),
       {
@@ -36,7 +38,6 @@ export const GET: APIRoute = async ({ params, request }) => {
       }
     );
   } catch (e) {
-    console.log(e);
     return new Response(
       JSON.stringify({
         currentUser: user,
