@@ -43,7 +43,7 @@ export const CartPage = () => {
             </button>
             {Object.keys(cart).length === 0 ? <EmptyCart /> : <CartList cart={cart} />}
             <div className={styles.total}>
-                Total: <span className={styles.totalValue}>${total.toFixed(2)}</span>
+                Total: <span className={styles.totalValue}>{total.toFixed(2)}&nbsp;€</span>
             </div>
         </div>
     );

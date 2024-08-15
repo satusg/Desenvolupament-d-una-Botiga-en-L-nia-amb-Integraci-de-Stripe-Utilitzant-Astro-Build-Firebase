@@ -8,7 +8,7 @@ const CartProduct = ({ product }) => {
             <img src={product.thumbnail} alt={product.title} style={{ width: '50px', height: '50px', marginRight: '10px' }} />
             <div style={{ flex: 1 }}>
                 <h4 style={{ margin: 0 }}>{product.title}</h4>
-                <p style={{ margin: 0, color: '#888' }}>${product.price.toFixed(2)}</p>
+                <p style={{ margin: 0, color: '#888' }}>{product.price.toFixed(2)}&nbsp;€</p>
             </div>
             <div>
                 {onCart(product) ? (

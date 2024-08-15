@@ -14,7 +14,7 @@ const Product = ({ product }) => {
         </div>
         <div>
             <h2>{product.title}</h2>
-            <p>{product.price}</p>
+            <p>{product.price.toFixed(2)}&nbsp;€</p>
             <p>{product.rating}</p>
             <p>{stock}</p>
             <p>{product?.tags?.join(', ')}</p>
