@@ -193,3 +193,6 @@ Creem el fitxer serviceAccountKey.json i afegim la clau secreta que obtenim desd
 # Important al canviar el nom de la base de dades de Firestore a un altre cal tenir-hon en compte al inicialitzar la conexió a aquesta ja que sino retorna un error 5 que no es massa ilustratiu.
 
 # Instalem zustand per tal de gestionar el contexte entre els diferents elements. 
+
+# Instalem stripe per tal de gestionar els pagaments
+npm install @stripe/react-stripe-js @stripe/stripe-js

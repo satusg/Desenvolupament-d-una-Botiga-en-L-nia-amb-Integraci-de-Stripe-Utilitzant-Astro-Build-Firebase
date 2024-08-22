@@ -1,0 +1,185 @@
+---
+import Stripe from "stripe";
+import admin from "@/firebase/admin";
+import axios from "axios";
+import { getTotal } from "@/utils/cart";
+
+const stripe = new Stripe(import.meta.env.PRIVATE_STRIPE_SECRET_KEY); // Stripe instance
+// Parse the URL to get the session_id
+const url = new URL(Astro.url);
+const searchParams = url.searchParams;
+const session_id = searchParams.get("session_id") || "";
+
+if (session_id === "") {
+  return Astro.redirect("/cart"); // Redirect to cart if no session_id is provided
+}
+
+// Retrieve the checkout session from Stripe
+const session = await stripe.checkout.sessions.retrieve(session_id);
+
+if (!session) {
+  return Astro.redirect("/cart"); // Redirect to cart if session retrieval fails
+}
+
+const db = admin.firestore();
+const checkoutRef = admin.firestore().collection("checkout").doc(session.id);
+const checkoutDoc = await checkoutRef.get();
+if (!checkoutDoc.exists) {
+  // Proceed with the refund and redirect the user to the cart page
+  try {
+    await stripe.refunds.create({
+      payment_intent: session.payment_intent as string,
+      amount: session.amount_total,
+    });
+    console.log("Refund successful");
+  } catch (error) {
+    console.error("Error refunding payment:", error.message);
+  }
+  return Astro.redirect("/cart");
+}
+const checkoutData = checkoutDoc.data();
+const checkoutProducts = checkoutData.products;
+if (checkoutData.status !== "pending") {
+  // Already processed or cancelled.
+  return Astro.redirect("/cart");
+}
+// checkoutData contains the total, products, user (uid), total, status, session_id
+// Stock Management will be omitted for simplicity and will proceed with the payment processing
+// The payment will be saved to Firestore for future reference
+
+// Obtain the customers current cart
+const uid = session.client_reference_id;
+const cartRef = admin.firestore().collection("carts").doc(`${uid}`);
+
+const doc = await cartRef.get();
+if (doc.exists) {
+  const cartProductsData = doc.data();
+  let cartProducts = cartProductsData.products;
+  // remove the products from the cart which have been paid
+  for (const product of Array.from(cartProducts)) {
+    const index = checkoutProducts.findIndex((p) => p.id === product);
+    if (index !== -1) {
+      cartProducts.splice(index, 1);
+    }
+  }
+  // recalculate the total
+  const total = getTotal(Array.from(cartProducts));
+  // update the cart in the database
+  await cartRef.update({
+    products: cartProducts,
+    total,
+  });
+}
+
+if (checkoutData.total !== session.amount_subtotal / 100) {
+  console.log("El importe pagado no coincide con el importe del carrito");
+  console.log("Importe pagado: ", session.amount_total / 100);
+  console.log("Importe del carrito: ", checkoutData.total);
+  // Aquí deberíamos proceder con la devolución del importe y redirigir al usuario a la página de carrito de nuevo
+  try {
+    // Asegúrate de que el payment_intent existe en la sesión
+    if (session.payment_intent) {
+      await stripe.refunds.create({
+        payment_intent: session.payment_intent as string, // Asegura que es un string
+        amount: session.amount_total, // Refund the full amount in cents
+      });
+      console.log("El importe ha sido reembolsado correctamente.");
+    } else {
+      console.error("No se encontró el payment_intent en la sesión de pago.");
+    }
+  } catch (error) {
+    console.error("Error al procesar el reembolso: ", error.message);
+  }
+
+  return Astro.redirect("/cart");
+}
+// Let's update the checkout status to "payed" or "failed" depending on the payment status
+await checkoutRef.update({
+  status: session.payment_status,
+});
+
+// Save the payment information to Firestore
+/**
+ * Payment Completed Successfully!
+
+Thank you for your payment. A receipt has been sent to admin@test.com.
+
+Total Paid: 41.28 EUR
+
+Payment Status: paid
+
+You can view your payment details here .
+
+{"id":"cs_test_b1dFaEBWed1qRtmNliJiDshvQtClznxfiAY8MSOVyPY5QRpWLpiecycodD","object":"checkout.session","after_expiration":null,"allow_promotion_codes":null,"amount_subtotal":2998,"amount_total":4128,"automatic_tax":{"enabled":true,"liability":{"type":"self"},"status":"complete"},"billing_address_collection":"required","cancel_url":"https://localhost:3000/cancel","client_reference_id":"XAcMV6tYD5clG2nsVjSR33RY3rY2","client_secret":null,"consent":null,"consent_collection":null,"created":1724257867,"currency":"eur","currency_conversion":null,"custom_fields":[],"custom_text":{"after_submit":null,"shipping_address":null,"submit":null,"terms_of_service_acceptance":null},"customer":null,"customer_creation":"if_required","customer_details":{"address":{"city":"La Portella","country":"ES","line1":"Carrer Barceloneta, 9, 1e","line2":null,"postal_code":"25134","state":"L"},"email":"admin@test.com","name":"svyatoslav","phone":null,"tax_exempt":"none","tax_ids":[]},"customer_email":"admin@test.com","expires_at":1724344267,"invoice":null,"invoice_creation":{"enabled":false,"invoice_data":{"account_tax_ids":null,"custom_fields":null,"description":null,"footer":null,"issuer":null,"metadata":{},"rendering_options":null}},"livemode":false,"locale":null,"metadata":{},"mode":"payment","payment_intent":"pi_3PqHRyEHma1FHEFw0ujNZPnu","payment_link":null,"payment_method_collection":"if_required","payment_method_configuration_details":null,"payment_method_options":{"card":{"request_three_d_secure":"automatic"}},"payment_method_types":["card"],"payment_status":"paid","phone_number_collection":{"enabled":false},"recovered_from":null,"saved_payment_method_options":null,"setup_intent":null,"shipping_address_collection":{"allowed_countries":["US","CA","GB","DE","FR","ES","IT"]},"shipping_cost":{"amount_subtotal":500,"amount_tax":87,"amount_total":500,"shipping_rate":"shr_1PqHR9EHma1FHEFw2WA07c6V"},"shipping_details":{"address":{"city":"La Portella","country":"ES","line1":"Carrer Barceloneta, 9, 1e","line2":null,"postal_code":"25134","state":"L"},"name":"svyatoslav"},"shipping_options":[{"shipping_amount":500,"shipping_rate":"shr_1PqHR9EHma1FHEFw2WA07c6V"},{"shipping_amount":1500,"shipping_rate":"shr_1PqHR9EHma1FHEFwFsKw5R93"}],"status":"complete","submit_type":null,"subscription":null,"success_url":"https://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}","total_details":{"amount_discount":0,"amount_shipping":500,"amount_tax":717},"ui_mode":"hosted","url":null} {"object":"list","data":[{"id":"li_1PqHR9EHma1FHEFwchBB4Jdp","object":"item","amount_discount":0,"amount_subtotal":999,"amount_tax":210,"amount_total":1209,"currency":"eur","description":"Essence Mascara Lash Princess","price":{"id":"price_1PqHR9EHma1FHEFwi3eKdsAo","object":"price","active":false,"billing_scheme":"per_unit","created":1724257867,"currency":"eur","custom_unit_amount":null,"livemode":false,"lookup_key":null,"metadata":{},"nickname":null,"product":"prod_QgZLBHGM7lMjTF","recurring":null,"tax_behavior":"exclusive","tiers_mode":null,"transform_quantity":null,"type":"one_time","unit_amount":999,"unit_amount_decimal":"999"},"quantity":1},{"id":"li_1PqHR9EHma1FHEFwvmn7gsvt","object":"item","amount_discount":0,"amount_subtotal":1999,"amount_tax":420,"amount_total":2419,"currency":"eur","description":"Eyeshadow Palette with Mirror","price":{"id":"price_1PqHR9EHma1FHEFwg2lce5uE","object":"price","active":false,"billing_scheme":"per_unit","created":1724257867,"currency":"eur","custom_unit_amount":null,"livemode":false,"lookup_key":null,"metadata":{},"nickname":null,"product":"prod_QgZLkmsIDLq8BI","recurring":null,"tax_behavior":"exclusive","tiers_mode":null,"transform_quantity":null,"type":"one_time","unit_amount":1999,"unit_amount_decimal":"1999"},"quantity":1}],"has_more":false,"url":"/v1/checkout/sessions/cs_test_b1dFaEBWed1qRtmNliJiDshvQtClznxfiAY8MSOVyPY5QRpWLpiecycodD/line_items"} Return to Home
+ */
+const paymentData = {
+  sessionId: session.id,
+  userId: session.client_reference_id,
+  amountSubtotal: session.amount_subtotal, // Amount before taxes and shipping
+  amountTotal: session.amount_total, // Total amount paid
+  currency: session.currency,
+  paymentStatus: session.payment_status,
+  paymentIntentId: session.payment_intent,
+  createdAt: new Date(session.created * 1000),
+  customerEmail: session.customer_email,
+  customerName: session.customer_details.name,
+  billingAddress: session.customer_details.address,
+  shippingDetails: {
+    name: session.shipping_details.name,
+    address: session.shipping_details.address,
+    shippingCostSubtotal: session.shipping_cost.amount_subtotal,
+    shippingCostTax: session.shipping_cost.amount_tax,
+    shippingCostTotal: session.shipping_cost.amount_total,
+  },
+  taxAmount: session.total_details.amount_tax,
+  shippingOptions: session.shipping_options,
+  successUrl: session.success_url,
+  cancelUrl: session.cancel_url,
+  // Save product details separately, as you mentioned
+  products: checkoutProducts,
+};
+// Save the payment on the db
+await db.collection("payments").doc(session.id).set(paymentData);
+// Send the user the email confirming the payment ( Ommited for simplicity)
+// Finally show the suc
+---
+
+<html>
+  <head>
+    <title>Payment Success</title>
+  </head>
+  <body>
+    <h1>Payment Completed Successfully!</h1>
+    <p>
+      Thank you for your payment. A receipt has been sent to <strong
+        >{session.customer_email}</strong
+      >.
+    </p>
+    <p>
+      Total Paid: <strong
+        >{(session.amount_total / 100).toFixed(2)}
+        {session.currency.toUpperCase()}</strong
+      >
+    </p>
+    <p>Payment Status: <strong>{session.payment_status}</strong></p>
+
+    {
+      session.payment_intent && (
+        <p>
+          You can view your payment details{" "}
+          <a
+            href={`https://dashboard.stripe.com/test/payments/${session.payment_intent}`}
+            target="_blank"
+          >
+            here
+          </a>
+          .
+        </p>
+      )
+    }
+
+    {JSON.stringify(session)}
+    {JSON.stringify(session.shipping_details.address)}
+    <a href="/">Return to Home</a>
+  </body>
+</html>

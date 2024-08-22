@@ -1,6 +1,6 @@
 import {create} from 'zustand';
 import axios from 'axios';
-
+import { loadStripe, Stripe } from '@stripe/stripe-js';
 
 // Define the product list management
 const useProductsStore = create((set, get) => ({
@@ -166,4 +166,5 @@ const useCartStore = create((set, get) => ({
     });
   }
 }));
+
 export { useCartStore,useProductsStore };

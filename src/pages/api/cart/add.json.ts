@@ -1,7 +1,7 @@
 import { type APIRoute } from "astro";
 import { getCurrentUser, authenticateForCart } from "@/utils/authentication";
 import admin from "@/firebase/admin";
-
+import { getTotal } from "@/utils/cart";
 export const POST: APIRoute = async ({ params, request }) => {
   const user = await authenticateForCart();
   const requestBody = await request.json();
@@ -20,16 +20,8 @@ export const POST: APIRoute = async ({ params, request }) => {
     }
 
     const cartData = doc.data();
-    let total = 0;
-
-    for (const key in cartData) {
-      if (key !== "total") {
-        const item = cartData[key];
-        total += item.price * item.quantity;
-        console.log(item.price, item.quantity);
-      }
-    }
-    console.log(total);
+    const products = cartData?.products || {};
+    const total = getTotal(products);
     await cartRef.set(
       {
         products: {
@@ -38,7 +30,7 @@ export const POST: APIRoute = async ({ params, request }) => {
             quantity,
           },
         },
-        total: total + product.price * quantity,
+        total: total,
       },
       { merge: true }
     );
