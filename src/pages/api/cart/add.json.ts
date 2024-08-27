@@ -20,16 +20,18 @@ export const POST: APIRoute = async ({ params, request }) => {
     }
 
     const cartData = doc.data();
-    const products = cartData?.products || {};
-    const total = getTotal(products);
+    const products = cartData?.products !== undefined ? cartData.products : {};
+    const productsWithAdded = {
+      ...products,
+      [product.id]: {
+        ...product,
+        quantity: quantity,
+      },
+    };
+    const total = getTotal(productsWithAdded);
     await cartRef.set(
       {
-        products: {
-          [product.id]: {
-            ...product,
-            quantity,
-          },
-        },
+        products: productsWithAdded,
         total: total,
       },
       { merge: true }

@@ -7,12 +7,7 @@ if (!auth.currentUser || auth.currentUser.isAnonymous) {
 }
 const { displayName, email } = auth.currentUser;
 import Logout from "@/components/Authentication.astro";
+import { AccountPage } from "@/components/react/AccountPage.jsx";
 ---
 
-<body>
-  <main>
-    <Logout />
-    <h1>Account</h1>
-    <p>Welcome, {displayName || email}!</p>
-  </main>
-</body>
+<AccountPage client:load />

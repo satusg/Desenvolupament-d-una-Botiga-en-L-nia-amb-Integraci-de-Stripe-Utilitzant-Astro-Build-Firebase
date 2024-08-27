@@ -2,6 +2,7 @@ import { type APIRoute } from "astro";
 import { getCurrentUser, authenticateForCart } from "@/utils/authentication";
 import admin from "@/firebase/admin";
 import Stripe from "stripe";
+
 interface Product {
   id: string;
   title: string;
@@ -30,10 +31,11 @@ export const POST: APIRoute = async ({ params, request }) => {
     const cartData = doc.data();
     const { products, total } = cartData;
     const stripe = new Stripe(import.meta.env.PRIVATE_STRIPE_SECRET_KEY);
+    console.log(user);
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      client_reference_id: user.uid, // User ID ( to link the payment to the user )
-      customer_email: user.email, // User email ( to send the receipt )
+      client_reference_id: user.uid,
+      customer_email: user.email ? user.email : undefined,
       line_items: Object.values(products).map((product: Product) => ({
         price_data: {
           currency: "eur",
@@ -103,7 +105,7 @@ export const POST: APIRoute = async ({ params, request }) => {
       success_url: `${request.headers.get(
         "origin"
       )}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.headers.get("origin")}/cancel`,
+      cancel_url: `${request.headers.get("origin")}/cart`,
       billing_address_collection: "required", // Collect the customer's billing address
     });
     // Intent to save the session ID in the database with the products and the user ID and the total amount in order to be able to retrieve the data later and associate it with the user and the actual products which have been bought
@@ -128,7 +130,19 @@ export const POST: APIRoute = async ({ params, request }) => {
       }
     );
   } catch (e) {
-    console.log(e);
+    if (e.message === "Invalid email address: ") {
+      return new Response(
+        JSON.stringify({
+          currentUser: user,
+          message: "Invalid email address",
+          error: e.message,
+        }),
+        {
+          status: 400,
+          headers: { "content-type": "application/json" },
+        }
+      );
+    }
     return new Response(
       JSON.stringify({
         currentUser: user,

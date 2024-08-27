@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import CartProduct from './CartProduct';
-import { useCartStore } from '@/store.js';
+import { useCartStore, useAccountStore } from '@/store.js';
+
 
 import styles from '@/components/react/styles/CartPage.module.css';
 
@@ -29,25 +30,26 @@ const CartList = ({ cart }) => (
 );
 
 async function handleCheckout() {
-    console.log(import.meta.env.PUBLIC_STRIPE_KEY);
     const stripe = await loadStripe(import.meta.env.PUBLIC_STRIPE_KEY);
 
     try {
-        const response = await fetch('/api/payment/create.json', {
+        let response = await fetch('/api/payment/create.json', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             }
         });
         if (!response.ok) { 
-            throw new Error('Failed to create checkout session');
+            // check whether the response is ok
+
+            throw Error('Failed to create checkout session', response);
         }
         const data = await response.json();
         if (data.error || !data.id) {
             if (data.error) {
-                throw new Error(data.error);
+                throw Error(data.error);
             }
-            throw new Error('Failed to create checkout session');
+            throw Error('Failed to create checkout session');
         }
         // Redirect to the Stripe Checkout page
         const { error } = await stripe.redirectToCheckout({
@@ -61,13 +63,17 @@ async function handleCheckout() {
         console.error(error);
     }
 }
-
 export const CartPage = () => {
     const { loadInitialCart, clearCart, cart, total, error, isLoading } = useCartStore();
+    const { loadUserData, getUser } = useAccountStore();
 
     useEffect(() => {
         loadInitialCart();
     }, [loadInitialCart]);
+
+    useEffect(() => {
+        loadUserData();
+    }, [loadUserData]);
 
     if (isLoading) return <Loading />;
     if (error) return <Error message={error} />;
@@ -79,15 +85,19 @@ export const CartPage = () => {
             </button>
             {Object.keys(cart).length === 0 ? <EmptyCart /> : <CartList cart={cart} />}
             <div className={styles.total}>
-                Total: <span className={styles.totalValue}>{total?.toFixed(2)}&nbsp;&#8364;</span>
+                Total: <span className={styles.totalValue}>{(parseInt(total) / 100)?.toFixed(2)}€</span>
             </div>
-             {Object.keys(cart).length > 0 && (
-                <button
-                    onClick={() => handleCheckout()}
-                    className={styles.checkoutButton}
-                >
-                    Checkout
-                </button>
+            {Object.keys(cart).length > 0 && (
+                <div style={
+                        { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }
+                    }>
+                    <button
+                        onClick={() => handleCheckout()}
+                        className={styles.checkoutButton}
+                    >
+                        Checkout
+                    </button>
+                </div>
             )}
         </div>
     );

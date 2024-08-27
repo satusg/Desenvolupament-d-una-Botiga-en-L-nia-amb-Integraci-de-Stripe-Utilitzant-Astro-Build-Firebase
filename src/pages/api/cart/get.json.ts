@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     return new Response(
       JSON.stringify({
         products,
-        total,
+        total,  
         message: "Products retrived from the cart successfully",
       }),
       {

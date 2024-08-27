@@ -1,6 +1,7 @@
 import { type APIRoute } from "astro";
 import { getCurrentUser, authenticateForCart } from "@/utils/authentication";
 import admin from "@/firebase/admin";
+import { getTotal } from "@/utils/cart";
 
 export const POST: APIRoute = async ({ params, request }) => {
   const user = await authenticateForCart();
@@ -54,7 +55,6 @@ export const POST: APIRoute = async ({ params, request }) => {
       );
     }
     // Verificar si el producto existe en el carrito
-
     if (!cartData?.products?.[product.id]) {
       return new Response(
         JSON.stringify({
@@ -67,21 +67,19 @@ export const POST: APIRoute = async ({ params, request }) => {
       );
     }
     // recalculate the total
-    cartData.total -=
-      (cartData.products[product.id]?.price || 0) *
-      (cartData.products[product.id]?.quantity || 0);
     // Actualizar la cantidad del producto
     if (cartData.products[product.id].quantity - quantity <= 0) {
       delete cartData.products[product.id];
     } else {
       cartData.products[product.id].quantity -= quantity;
     }
-    // recalculate the total
-    cartData.total +=
-      (cartData.products[product.id]?.price || 0) *
-      (cartData.products[product.id]?.quantity || 0);
+    const productsCartData = cartData.products;
+    const total = getTotal(productsCartData);
     // Actualizar el carrito en Firestore
-    await cartRef.set(cartData);
+    await cartRef.set({
+      productsCartData,
+      total,
+    });
 
     return new Response(
       JSON.stringify({

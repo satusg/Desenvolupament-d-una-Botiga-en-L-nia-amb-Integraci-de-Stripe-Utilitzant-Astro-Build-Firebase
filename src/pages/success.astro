@@ -16,7 +16,7 @@ if (session_id === "") {
 
 // Retrieve the checkout session from Stripe
 const session = await stripe.checkout.sessions.retrieve(session_id);
-
+console.log(session);
 if (!session) {
   return Astro.redirect("/cart"); // Redirect to cart if session retrieval fails
 }
@@ -54,7 +54,8 @@ const cartRef = admin.firestore().collection("carts").doc(`${uid}`);
 const doc = await cartRef.get();
 if (doc.exists) {
   const cartProductsData = doc.data();
-  let cartProducts = cartProductsData.products;
+  let cartProducts =
+    cartProductsData.products !== undefined ? cartProductsData.products : {};
   // remove the products from the cart which have been paid
   for (const product of Array.from(cartProducts)) {
     const index = checkoutProducts.findIndex((p) => p.id === product);
@@ -63,7 +64,7 @@ if (doc.exists) {
     }
   }
   // recalculate the total
-  const total = getTotal(Array.from(cartProducts));
+  const total = getTotal(cartProducts);
   // update the cart in the database
   await cartRef.update({
     products: cartProducts,
@@ -71,7 +72,7 @@ if (doc.exists) {
   });
 }
 
-if (checkoutData.total !== session.amount_subtotal / 100) {
+if (checkoutData.total !== session.amount_subtotal) {
   console.log("El importe pagado no coincide con el importe del carrito");
   console.log("Importe pagado: ", session.amount_total / 100);
   console.log("Importe del carrito: ", checkoutData.total);
@@ -93,9 +94,13 @@ if (checkoutData.total !== session.amount_subtotal / 100) {
 
   return Astro.redirect("/cart");
 }
+const customerEmail = session.customer_email
+  ? session.customer_email
+  : session.customer_details.email;
 // Let's update the checkout status to "payed" or "failed" depending on the payment status
 await checkoutRef.update({
   status: session.payment_status,
+  email: customerEmail,
 });
 
 // Save the payment information to Firestore
@@ -121,7 +126,7 @@ const paymentData = {
   paymentStatus: session.payment_status,
   paymentIntentId: session.payment_intent,
   createdAt: new Date(session.created * 1000),
-  customerEmail: session.customer_email,
+  customerEmail: customerEmail,
   customerName: session.customer_details.name,
   billingAddress: session.customer_details.address,
   shippingDetails: {
@@ -138,6 +143,7 @@ const paymentData = {
   // Save product details separately, as you mentioned
   products: checkoutProducts,
 };
+console.log(paymentData);
 // Save the payment on the db
 await db.collection("payments").doc(session.id).set(paymentData);
 // Send the user the email confirming the payment ( Ommited for simplicity)
@@ -164,18 +170,14 @@ await db.collection("payments").doc(session.id).set(paymentData);
     <p>Payment Status: <strong>{session.payment_status}</strong></p>
 
     {
-      session.payment_intent && (
-        <p>
-          You can view your payment details{" "}
-          <a
-            href={`https://dashboard.stripe.com/test/payments/${session.payment_intent}`}
-            target="_blank"
-          >
-            here
+      session.payment_intent &&
+        (session.customer_email ? (
+          <a href={"/account"} target="_blank">
+            You can view your payment details here
           </a>
-          .
-        </p>
-      )
+        ) : (
+          ""
+        ))
     }
 
     {JSON.stringify(session)}
