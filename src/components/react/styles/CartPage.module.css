@@ -1,38 +1,16 @@
-.cartPage {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.header {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
-    padding: 20px 20px 0;
-    text-align: center;
-    background-color: #f8f8f8;
-    border-bottom: 1px solid #eaeaea;
-}
-
 .cartList {
     list-style: none;
     margin: 0;
     padding: 0;
 }
-
+li.cartItem{
+    border-bottom: 0;
+}
 .cartItem {
-    background-color: #fafafa;
-    border-bottom: 1px solid #ececec;
     padding: 15px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: background-color 0.2s ease-in-out;
 }
 
 .cartItem:last-child {

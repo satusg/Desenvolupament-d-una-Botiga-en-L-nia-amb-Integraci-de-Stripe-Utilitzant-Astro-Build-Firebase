@@ -15,17 +15,15 @@ export const ProductsPage = () => {
 
     return (
       <div>
-            {nextUrl}
-      <h1>Products</h1>
-      <div>
-        <button onClick={fetchPrevious} disabled={!prevUrl}>Previous</button>
-        <button onClick={fetchNext} disabled={!nextUrl}>Next</button>
-      </div>
-      <ul>
-        {products.map(product => (
-          <Product key={product.id} product={product} />
-        ))}
-      </ul>
+        <div>
+          <button onClick={fetchPrevious} disabled={!prevUrl}>Previous</button>
+          <button onClick={fetchNext} disabled={!nextUrl}>Next</button>
+        </div>
+        <ul>
+          {products.map(product => (
+            <Product key={product.id} product={product} />
+          ))}
+        </ul>
     </div>
   );
 }

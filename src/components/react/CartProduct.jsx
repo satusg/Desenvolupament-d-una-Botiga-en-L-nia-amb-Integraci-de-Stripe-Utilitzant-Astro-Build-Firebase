@@ -1,27 +1,27 @@
 import { useCartStore } from '@/store.js';
-
+import styles from '@/components/react/styles/CartProduct.module.css';
 const CartProduct = ({ product }) => {
     const { addToCart, removeFromCart, onCart } = useCartStore();
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
-            <img src={product.thumbnail} alt={product.title} style={{ width: '50px', height: '50px', marginRight: '10px' }} />
-            <div style={{ flex: 1 }}>
-                <h4 style={{ margin: 0 }}>{product.title}</h4>
-                <p style={{ margin: 0, color: '#888' }}>{product.price.toFixed(2)}&nbsp;€</p>
+        <article className={styles.cartProduct}>
+            <img src={product.thumbnail} alt={product.title} />
+            <div>
+                <h4>{product.title}</h4>
+                <p >{product.price.toFixed(2)}&nbsp;€</p>
             </div>
             <div>
                 {onCart(product) ? (
-                    <button onClick={() => removeFromCart(product)} style={{ padding: '5px 10px' }}>
+                    <button onClick={() => removeFromCart(product)} >
                         Remove
                     </button>
                 ) : (
-                    <button onClick={() => addToCart(product)} style={{ padding: '5px 10px' }}>
+                    <button onClick={() => addToCart(product)}>
                         Add
                     </button>
                 )}
             </div>
-        </div>
+        </article>
     );
 }
 

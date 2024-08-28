@@ -1,14 +1,14 @@
 ---
 // Missing remove the default values form input fields
 import { auth } from "@/firebase/config";
+import Layout from "@/layouts/Layout.astro";
 if (auth.currentUser && !auth.currentUser.isAnonymous) {
   return Astro.redirect("/");
 }
 ---
 
-<body>
-  <main>
-    <h1>Register</h1>
+<Layout title="Register">
+  <section slot="main">
     <form action="api/register.json" method="post" id="registerForm">
       <label for="name">Name</label>
       <input
@@ -45,8 +45,8 @@ if (auth.currentUser && !auth.currentUser.isAnonymous) {
       <button type="button">Register</button>
       <p id="error" style="display:none;"></p>
     </form>
-  </main>
-</body>
+  </section>
+</Layout>
 <script>
   import Axios from "axios";
   document.addEventListener("DOMContentLoaded", () => {
@@ -106,33 +106,3 @@ if (auth.currentUser && !auth.currentUser.isAnonymous) {
     });
   });
 </script>
-<style>
-  main h1 {
-    text-align: center;
-  }
-  form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  label {
-    font-weight: bold;
-  }
-  input {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-  }
-  button {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    grid-column-start: 1;
-    grid-column-end: 3;
-  }
-  button:hover {
-    background-color: #e0e0e0;
-    cursor: pointer;
-  }
-</style>

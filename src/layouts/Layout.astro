@@ -1,82 +1,244 @@
 ---
 import Logout from "@/components/Authentication.astro";
+
+// Definiendo las props con valores por defecto
+const {
+  primaryColor = "#333",
+  secondaryColor = "#555",
+  accentColor = "#ff6f61",
+  backgroundColor = "rgb(240, 240, 240)",
+  headerHeight = "clamp(60px, 10vw, 80px)",
+  footerHeight = "80px",
+  title = "Your Store | Home",
+  description = "Your Store - The best place to shop online for your favorite products",
+  keywords = "e-commerce, shop, online store, buy, products",
+  author = "Your Store Name",
+} = Astro.props;
 ---
 
-<body>
-  <header>
-    <nav>
-      <ul>
-        <li><Logout /></li>
-      </ul>
-    </nav>
-  </header>
-  <main>
-    <slot name="main" />
-  </main>
-  <aside>
-    <nav>
-      <ul>
-        <li>
-          <a href="/about">About</a>
-        </li>
-        <li>
-          <a href="/blog">Blog</a>
-        </li>
-      </ul>
-    </nav>
-  </aside>
-  <footer>
-    <h4>Footer Content</h4>
-  </footer>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content={author} />
+    <meta name="robots" content="index, follow" />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/path/to/your/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <nav class="top-nav">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/products">Shop</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><Logout /></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>
+        {title}
+      </h1>
+      <div class="container">
+        <slot name="main" />
+      </div>
+    </main>
+    <footer>
+      <nav>
+        <ul>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms & Conditions</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </nav>
+      <p>&copy; 2024 {author}. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
 
-<style>
+<style
+  is:global
+  define:vars={{
+    primaryColor,
+    secondaryColor,
+    accentColor,
+    backgroundColor,
+    headerHeight,
+    footerHeight,
+  }}
+>
+  :root {
+    --container-width: 1400px; /* Puedes ajustar el ancho máximo del contenedor */
+    --container-padding: 20px;
+  }
+
   body {
     margin: 0;
     display: grid;
-    grid-template-rows: auto 1fr auto;
-    grid-template-columns: 1fr 4fr;
-    column-gap: 10px;
+    grid-template-rows: var(--headerHeight) 1fr var(--footerHeight);
     width: 100vw;
     height: 100vh;
-    font-family: Arial, sans-serif;
+    font-family: "Inter", sans-serif;
+    background-color: var(--backgroundColor);
   }
-  header {
-    background-color: brown;
-    grid-area: 1 / 1 / 2 / 3;
-    padding: 10px;
+
+  .top-nav {
+    background-color: var(--primaryColor);
+    backdrop-filter: blur(10px);
+    grid-area: 1 / 1 / 2 / 2;
+    padding: 15px;
     color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
+
+  .top-nav ul {
+    list-style: none;
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: var(--container-padding);
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+  }
+
+  .top-nav ul li {
+    margin: 0;
+  }
+
+  .top-nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: clamp(14px, 1.5vw, 18px);
+    position: relative;
+  }
+
+  .top-nav ul li a::after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 2px;
+    background: var(--accentColor);
+    transition: width 0.3s;
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+  }
+
+  .top-nav ul li a:hover::after {
+    width: 100%;
+  }
+
   main {
-    background-color: white;
-    grid-area: 2 / 2 / 3 / 3;
-    padding: 10px;
+    background-color: var(--backgroundColor);
+    padding: var(--container-padding);
+    overflow-y: auto;
   }
-  aside {
-    background-color: blueviolet;
-    grid-area: 2 / 1 / 3 / 2;
-    padding: 10px;
-    color: white;
+
+  .container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: var(--container-padding);
   }
+
   footer {
-    background-color: black;
+    background-color: var(--primaryColor);
     color: white;
-    grid-area: 3 / 1 / 4 / 3;
-    padding: 10px;
+    padding: 20px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
-  nav ul {
-    list-style-type: none;
+
+  footer nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    gap: 10px;
+    gap: 15px;
   }
-  nav ul li {
+
+  footer nav ul li {
     margin: 0;
   }
-  nav ul li a {
-    color: inherit;
+
+  footer nav ul li a {
+    color: white;
     text-decoration: none;
+    font-size: clamp(12px, 1.2vw, 14px);
+  }
+
+  @media (max-width: 768px) {
+    .top-nav ul {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .container {
+      padding: 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .top-nav {
+      padding: 10px;
+    }
+
+    .top-nav ul {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    footer nav ul {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  /**
+  * Estilos para el formulario de registro / login
+  */
+  main h1 {
+    text-align: center;
+  }
+  form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  label {
+    font-weight: bold;
+  }
+  input {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+  }
+  button {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    grid-column-start: 1;
+    grid-column-end: 3;
+  }
+  button:hover {
+    background-color: #e0e0e0;
+    cursor: pointer;
   }
 </style>

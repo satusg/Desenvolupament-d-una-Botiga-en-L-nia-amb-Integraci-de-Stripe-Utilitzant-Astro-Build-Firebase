@@ -79,7 +79,6 @@ export const CartPage = () => {
     if (error) return <Error message={error} />;
     return (
         <div className={styles.cartPage}>
-            <h1 className={styles.header}>Your Cart</h1>
             <button onClick={clearCart} className={styles.clearButton} disabled={Object.keys(cart).length === 0}>
                 Clear Cart
             </button>

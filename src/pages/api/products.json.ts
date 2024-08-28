@@ -17,8 +17,6 @@ export const GET: APIRoute = async ({ params, request }) => {
       Math.max(parseInt(urlParams.get("limit") || "1"), 1),
       100
     );
-
-    console.log(limit);
     let productsQuery = productsRef.orderBy("createdAt").limit(limit);
     let nextUrl = null;
     let prevUrl = null;

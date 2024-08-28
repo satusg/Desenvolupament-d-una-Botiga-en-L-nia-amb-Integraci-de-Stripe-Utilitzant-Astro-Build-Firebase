@@ -1,6 +1,8 @@
 ---
 import { CartPage } from "@/components/react/CartPage";
+import Layout from "@/layouts/Layout.astro";
 ---
 
-<meta charset="utf-8" />
-<CartPage client:load />
+<Layout title="Your Cart">
+  <CartPage slot="main" client:load />
+</Layout>

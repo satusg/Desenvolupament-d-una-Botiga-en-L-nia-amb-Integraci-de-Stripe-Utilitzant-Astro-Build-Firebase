@@ -30,7 +30,6 @@ export const POST: APIRoute = async ({ request }) => {
     if (newEmail && newEmail !== email) {
       // Asegura que el nuevo email es diferente
       const userRecord = await admin.auth().getUserByEmail(newEmail);
-      console.log(userRecord);
       if (userRecord) {
         return new Response(
           JSON.stringify({

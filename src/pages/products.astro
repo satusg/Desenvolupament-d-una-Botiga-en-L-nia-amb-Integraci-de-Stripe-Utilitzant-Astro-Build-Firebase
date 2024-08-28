@@ -1,5 +1,8 @@
 ---
 import { ProductsPage } from "@/components/react/ProductsPage";
+import Layout from "@/layouts/Layout.astro";
 ---
 
-<ProductsPage client:load />
+<Layout title="Shop">
+  <ProductsPage slot="main" client:load />
+</Layout>

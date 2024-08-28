@@ -1,0 +1,29 @@
+.cartProduct {
+    display: 'flex';
+    align-items: 'center'; 
+    padding: '10px'; 
+    border-bottom: '1px solid #ddd';
+}
+
+.cartProduct img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.cartProduct-details {
+    flex: 1;
+}
+
+.cartProduct-title {
+    margin: 0;
+}
+
+.cartProduct-price {
+    margin: 0;
+    color: #888;
+}
+
+.cartProduct-button {
+    padding: 5px 10px;
+}

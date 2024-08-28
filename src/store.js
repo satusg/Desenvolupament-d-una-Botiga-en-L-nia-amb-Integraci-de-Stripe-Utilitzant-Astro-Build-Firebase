@@ -9,11 +9,13 @@ const useProductsStore = create((set, get) => ({
   prevUrl: null,
 
   // Fetch products from a given URL
+
   fetchProducts: async (url) => {
+    const currentProducts = get().products;
     try {
       const response = await axios.get(url);
       set({
-        products: response.data?.products ?? [],
+        products: currentProducts.concat(response.data?.products ?? []),
         nextUrl: response.data?.nextUrl ?? null,
         prevUrl: response.data?.prevUrl ?? null
       });
@@ -25,7 +27,7 @@ const useProductsStore = create((set, get) => ({
 
   // Load initial products
   loadInitialProducts: () => {
-    get().fetchProducts('/api/products.json');
+    get().fetchProducts('/api/products.json?limit=10');
   },
 
   // Handlers for pagination
