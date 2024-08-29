@@ -1,25 +1,42 @@
-import React, { useEffect } from 'react';
+import  { useEffect } from 'react';
 import { useProductsStore } from '@/store.js';
 import Product from './Product';
 import { useCartStore } from '../../store';
+import styles from '@/components/react/styles/ProductsPage.module.css';
 
 export const ProductsPage = () => {
-  const { products, nextUrl, prevUrl, loadInitialProducts, fetchNext } = useProductsStore();
+  const { products, nextUrl, loadInitialProducts, fetchNext } = useProductsStore();
   const { loadInitialCart } = useCartStore();
+
   useEffect(() => {
-      loadInitialProducts();
-  }, [loadInitialProducts]);
-  useEffect(() => {
+    loadInitialProducts();
     loadInitialCart();
-  }, []);
-    return (
-      <div>
-        <ul>
+  }, [loadInitialProducts, loadInitialCart]);
+
+  return (
+    <div className={styles.productsPage}>
+      {products.length === 0 ? (
+        <div className={styles.loading}>Loading products...</div>
+      ) : (
+        <ul className={styles.productList}>
           {products.map(product => (
-            <Product key={product.id} product={product} />
+            <li key={product.id} className={styles.productItem}>
+              <Product product={product} />
+            </li>
           ))}
-          <button onClick={fetchNext} disabled={!nextUrl}>Show more products</button>
         </ul>
+      )}
+      <div className={styles.pagination}>
+        <button 
+          onClick={fetchNext} 
+          disabled={!nextUrl} 
+          className={styles.loadMoreButton}
+        >
+          {nextUrl ? 'Show more products' : 'No more products'}
+        </button>
+      </div>
     </div>
   );
-}
+};
+
+export default ProductsPage;

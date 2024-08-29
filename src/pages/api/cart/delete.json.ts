@@ -61,7 +61,7 @@ export const POST: APIRoute = async ({ params, request }) => {
           message: "Product not found in cart",
         }),
         {
-          status: 404,
+          status: 200,
           headers: { "content-type": "application/json" },
         }
       );

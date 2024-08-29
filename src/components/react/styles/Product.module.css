@@ -1,10 +1,9 @@
 /* General Styles */
 .productCard {
-    background-color: #f8f9fa;
+    height: 100%;
     margin-bottom: 1.5rem;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1rem 0.5rem;
+    border-radius: 1rem;
     display: grid;
     grid-template-columns: 1fr 2fr auto;
     grid-template-rows: 
@@ -17,19 +16,17 @@
         "tags tags tags tags" 
         "title title title title" 
         "imageandrating description price price" 
-        "imageandrating category category stock" 
-        "imageandrating actions actions actions" 
+        "imageandrating description price price"
+        "imageandrating description price price"
+        "imageandrating description price price" 
+        "imageandrating description category category" 
+        "imageandrating description stock  stock" 
+        "actions actions actions actions" 
         ;
     gap: 1rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.productCard:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Tags */
 .productTags {
     display: flex;
     gap: 0.5rem;
@@ -48,7 +45,7 @@
     font-weight: 500;
 }
 
-/* Title */
+
 .productTitle {
     margin:0; 
     font-size: 1.75rem;
@@ -58,7 +55,7 @@
     margin-bottom: 0.5rem;
 }
 
-/* Image & Rating */
+
 .imageContainer {
     grid-area: imageandrating;
     display: flex;
@@ -83,12 +80,12 @@
 .starIcon {
     width: 20px;
     height: 20px;
-    fill: #ffd700; /* Gold color for stars */
+    fill: #ffd700; 
     margin-right: 0.2rem;
 }
 
 .starIcon.empty {
-    fill: #ccc; /* Gray color for empty stars */
+    fill: #ccc; 
 }
 
 
