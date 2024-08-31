@@ -13,7 +13,9 @@ const Error = ({ message }) => (
 );
 
 const EmptyCart = () => (
-    <div className={styles.emptyCart}>Your cart is empty</div>
+    <div className={styles.emptyCart}>
+        Go back to the <a href="/products">store</a> to add items to your cart.
+    </div>
 );
 
 const CartList = ({ cart }) => (
@@ -76,6 +78,8 @@ export const CartPage = () => {
 
     return (
         <div className={styles.cartPage}>
+            {!isCartEmpty && 
+            (
             <div className={styles.cartHeader}>
                 <button 
                     onClick={clearCart} 
@@ -85,6 +89,9 @@ export const CartPage = () => {
                     Clear Cart
                 </button>
             </div>
+            )
+            }
+
             {isCartEmpty ? <EmptyCart /> : <CartList cart={cart} />}
             {!isCartEmpty && (
                 <div className={styles.checkoutSection}>

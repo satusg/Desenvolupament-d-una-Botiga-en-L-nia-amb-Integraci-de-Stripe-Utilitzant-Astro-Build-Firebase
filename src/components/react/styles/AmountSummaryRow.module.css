@@ -1,0 +1,14 @@
+.summaryRow {
+    margin-bottom: 2rem;
+    
+}
+.label {
+    font-weight: 600;
+    font-size: 1.4rem;
+    color: black;
+}
+.value {
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: black;
+}

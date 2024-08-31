@@ -12,7 +12,7 @@ const {
   title = "Your Store | Home",
   description = "Your Store - The best place to shop online for your favorite products",
   keywords = "e-commerce, shop, online store, buy, products",
-  author = "Your Store Name",
+  author = "Store Name",
 } = Astro.props;
 ---
 
@@ -26,33 +26,31 @@ const {
     <meta name="robots" content="index, follow" />
     <title>{title}</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="/path/to/your/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
       rel="stylesheet"
     />
+    <slot name="head" />
   </head>
   <body>
     <header>
+      <input type="checkbox" id="menu-toggle" class="menu-toggle" />
+      <label for="menu-toggle" class="menu-icon">&#9776;</label>
       <nav class="top-nav">
         <ul>
           <li><a href="/">Home</a></li>
           <li><a href="/products">Shop</a></li>
           <li><a href="/about">About</a></li>
           <li><a href="/contact">Contact</a></li>
-          <li><Logout /></li>
+          <Logout />
         </ul>
       </nav>
     </header>
     <main>
-      <h1>
-        {title}
-      </h1>
-      <div class="container">
-        <slot name="main" />
-      </div>
+      <h1>{title}</h1>
+      <slot name="main" />
     </main>
     <footer>
       <nav>
@@ -66,7 +64,6 @@ const {
     </footer>
   </body>
 </html>
-
 <style
   is:global
   define:vars={{
@@ -79,10 +76,19 @@ const {
   }}
 >
   :root {
-    --container-width: 1400px; /* Puedes ajustar el ancho máximo del contenedor */
-    --container-padding: 20px;
+    --container-width: 80%;
+    --container-padding: 1rem;
+  }
+  h1 {
+    text-align: center;
+    margin: 2rem 0;
   }
 
+  main {
+    width: var(--container-width);
+    padding: var(--container-padding);
+    margin: 0 auto;
+  }
   body {
     margin: 0;
     display: grid;
@@ -93,152 +99,151 @@ const {
     background-color: var(--backgroundColor);
   }
 
+  .menu-toggle {
+    display: none;
+  }
+
+  .menu-icon {
+    display: none;
+    font-size: 2rem;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1050;
+  }
+  header {
+    overflow-x: hidden;
+  }
+
   .top-nav {
     background-color: var(--primaryColor);
     backdrop-filter: blur(10px);
-    grid-area: 1 / 1 / 2 / 2;
-    padding: 15px;
+    padding: 1rem;
     color: white;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    transition: transform 0.3s ease;
   }
 
   .top-nav ul {
+    width: 80%;
     list-style: none;
-    max-width: var(--container-width);
-    margin: 0 auto;
-    padding: var(--container-padding);
     display: flex;
-    gap: 20px;
+    padding: 0;
+    margin: auto 0;
     justify-content: space-between;
   }
-
-  .top-nav ul li {
-    margin: 0;
+  .top-nav ul button {
+    padding: 0.5rem 0;
   }
-
+  .top-nav ul button {
+    cursor: pointer;
+    width: 100%;
+    background-color: transparent;
+    border: none;
+  }
+  .top-nal ul li {
+    align-content: center;
+  }
+  .top-nav ul button,
   .top-nav ul li a {
     color: white;
     text-decoration: none;
-    font-size: clamp(14px, 1.5vw, 18px);
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
     position: relative;
+    padding: 0.5rem 0;
   }
-
-  .top-nav ul li a::after {
-    content: "";
-    display: block;
-    width: 0;
-    height: 2px;
-    background: var(--accentColor);
-    transition: width 0.3s;
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-  }
-
-  .top-nav ul li a:hover::after {
-    width: 100%;
-  }
-
-  main {
-    background-color: var(--backgroundColor);
-    padding: var(--container-padding);
-    overflow-y: auto;
-  }
-
-  .container {
-    max-width: var(--container-width);
-    margin: 0 auto;
-    padding: var(--container-padding);
-  }
-
-  footer {
-    background-color: var(--primaryColor);
-    color: white;
-    padding: 20px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  footer nav ul {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    margin: 0;
+  .top-nav ul button {
     padding: 0;
-    gap: 15px;
-  }
-
-  footer nav ul li {
-    margin: 0;
-  }
-
-  footer nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: clamp(12px, 1.2vw, 14px);
   }
 
   @media (max-width: 768px) {
-    .top-nav ul {
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
+    .menu-icon {
+      display: block;
     }
-
-    .container {
-      padding: 10px;
-    }
-  }
-
-  @media (max-width: 480px) {
     .top-nav {
-      padding: 10px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      transform: translateY(-100%);
     }
-
     .top-nav ul {
+      width: 80%;
       flex-direction: column;
-      gap: 8px;
+      background-color: var(--primaryColor);
+      transition: transform 0.3s ease;
+    }
+    .top-nav ul li {
+      width: 100%;
+      text-align: center;
+    }
+    .top-nav ul li a {
+      display: block;
+      width: 100%;
+    }
+    .menu-toggle:checked + .menu-icon + .top-nav {
+      transform: translateY(0);
+    }
+  }
+  footer {
+    background-color: var(--primaryColor);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+  }
+
+  footer nav {
+    margin-bottom: 0.5rem;
+  }
+
+  footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  footer ul li {
+    margin: 0;
+  }
+
+  footer ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+  }
+
+  footer ul li a:hover {
+    color: var(--accentColor);
+  }
+
+  footer p {
+    margin: 0.5rem 0 0;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 768px) {
+    footer {
+      padding: 1.5rem 0.5rem;
     }
 
-    footer nav ul {
+    footer ul {
       flex-direction: column;
-      gap: 10px;
+      gap: 0.5rem;
     }
-  }
-  /**
-  * Estilos para el formulario de registro / login
-  */
-  main h1 {
-    text-align: center;
-  }
-  form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  label {
-    font-weight: bold;
-  }
-  input {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-  }
-  button {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    grid-column-start: 1;
-    grid-column-end: 3;
-  }
-  button:hover {
-    background-color: #e0e0e0;
-    cursor: pointer;
   }
 </style>

@@ -1,0 +1,105 @@
+/* AccountPage.module.css */
+
+/* General Styles */
+.accountPage {
+    padding: 20px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+}
+
+.header {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.paymentsHeader {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-top: 40px;
+    margin-bottom: 25px;
+}
+
+.loading, .error, .noPayments {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.2rem;
+    color: #7f8c8d;
+}
+
+.loading {
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Account Details */
+.accountDetails {
+    margin-bottom: 30px;
+    padding: 25px;
+    border: 1px solid #dfe6e9;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+.productImage {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 20px;
+    border-radius: 8px;
+    border: 1px solid #bdc3c7;
+}
+
+.productInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.productInfo h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.productInfo p {
+    margin: 0;
+    color: #7f8c8d;
+}
+
+/* Payment Summary */
+.paymentSummary {
+    margin-bottom: 30px;
+    padding: 25px;
+    border: 1px solid #dfe6e9;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+/* Payment List */
+.paymentList {
+    margin-top: 30px;
+}
+
+.paymentItem {
+    margin-bottom: 35px;
+}

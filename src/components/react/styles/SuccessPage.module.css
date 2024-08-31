@@ -1,0 +1,112 @@
+.successPage {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.successTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: black;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.thankYouMessage {
+    font-size: 1.25rem;
+    color: black;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.sectionHeader {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: black;
+}
+
+.orderSummary,
+.orderTotals,
+.shippingAddress {
+    margin-bottom: 2rem;
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+}
+
+.label {
+    font-weight: 600;
+    color: black;
+}
+
+.value {
+    color: black;
+}
+
+.productList {
+    margin-top: 1.5rem;
+}
+
+.productItem {
+    display: flex;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.productImage img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+}
+
+.productInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.productName {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.productQuantity,
+.productPrice {
+    font-size: 1rem;
+    color: black;
+}
+
+.actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.homeLink,
+.accountLink {
+    margin-right: 1rem;
+    border: 1px solid rgb(18, 18, 18);
+    color: rgb(18, 18, 18);
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease-in-out;
+    text-decoration: none;
+}
+
+
+
+.homeLink:hover, .accountLink:hover  {
+    color: white;
+    background: black;
+}

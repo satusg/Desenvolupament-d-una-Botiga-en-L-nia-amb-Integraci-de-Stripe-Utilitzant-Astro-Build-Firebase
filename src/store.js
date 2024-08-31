@@ -21,7 +21,6 @@ const useProductsStore = create((set, get) => ({
       });
     } catch (error) {
       console.error("Failed to fetch products:", error.message);
-      alert(error.message || 'Failed to fetch products');
     }
   },
 

@@ -15,8 +15,6 @@ interface Product {
 
 export const POST: APIRoute = async ({ params, request }) => {
   const user = await authenticateForCart();
-  // const requestBody = await request.json();
-  // const { product, quantity } = requestBody;
   try {
     if (user?.uid === null || user?.uid === undefined) {
       throw new Error("User has not been authenticated");
@@ -31,11 +29,10 @@ export const POST: APIRoute = async ({ params, request }) => {
     const cartData = doc.data();
     const { products, total } = cartData;
     const stripe = new Stripe(import.meta.env.PRIVATE_STRIPE_SECRET_KEY);
-    console.log(user);
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       client_reference_id: user.uid,
-      customer_email: user.email ? user.email : undefined,
+      customer_email: user?.email ? user.email : undefined,
       line_items: Object.values(products).map((product: Product) => ({
         price_data: {
           currency: "eur",

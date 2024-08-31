@@ -6,8 +6,10 @@ if (!auth.currentUser || auth.currentUser.isAnonymous) {
   return Astro.redirect("/");
 }
 const { displayName, email } = auth.currentUser;
-import Logout from "@/components/Authentication.astro";
+import Layout from "@/layouts/Layout.astro";
 import { AccountPage } from "@/components/react/AccountPage.jsx";
 ---
 
-<AccountPage client:load />
+<Layout title="Your Account">
+  <AccountPage slot="main" client:load />
+</Layout>

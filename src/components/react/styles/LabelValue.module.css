@@ -1,0 +1,17 @@
+.label {
+    font-weight: 600;
+    flex-basis: 30%;
+    text-transform: capitalize;
+}
+
+.value {
+    flex-basis: 70%;
+    text-align: right;
+     text-transform: capitalize;
+}
+
+.row{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
