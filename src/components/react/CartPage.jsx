@@ -13,9 +13,11 @@ const Error = ({ message }) => (
 );
 
 const EmptyCart = () => (
-    <div className={styles.emptyCart}>
-        Go back to the <a href="/products">store</a> to add items to your cart.
-    </div>
+    <button className={styles.emptyCart} onClick={() => {
+        window.location.href = '/products';
+    }}>
+        Go back to the store to add items to your cart.
+    </button>
 );
 
 const CartList = ({ cart }) => (

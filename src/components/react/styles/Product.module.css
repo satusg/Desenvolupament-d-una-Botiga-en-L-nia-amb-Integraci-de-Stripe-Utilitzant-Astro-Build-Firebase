@@ -35,6 +35,7 @@
 }
 
 .productTag {
+    cursor: pointer;
     text-transform: capitalize;
     border: 1px solid #dc3545;
     padding: 0.3rem 0.8rem;
@@ -149,14 +150,60 @@
     background-color: rgb(18, 18, 18);
     color : #fff;
 }
+ 
 
 .viewDetailsButton {
-    background-color: #28a745;
-    color: #fff;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgb(18, 18, 18);
+    background-color:#fff;
 }
 
-.viewDetailsButton:hover {
-    background-color: #218838;
+.viewDetailsButton svg{
+    fill:rgb(18, 18, 18);
+    height: 100%;
+}
+.viewDetailsButton:hover{
+    background-color:rgb(18, 18, 18);
+    border-color: rgb(18, 18, 18);
+}
+.viewDetailsButton:hover svg{
+    fill:#fff;
+}
+
+
+
+.removeFromCartButton {
+    border: 1px solid rgb(18, 18, 18);
+    background-color:#fff;
+}
+
+.removeFromCartButton svg{
+    fill:rgb(18, 18, 18);
+    height: 100%;
+}
+.removeFromCartButton:hover{
+    background-color:rgb(18, 18, 18);
+    border-color: rgb(18, 18, 18);
+}
+.removeFromCartButton:hover svg{
+    fill:#fff;
+}
+
+
+.addToCartButton {
+    border: 1px solid rgb(18, 18, 18);
+    background-color: rgb(18, 18, 18);
+}
+
+.addToCartButton svg{
+    fill:#fff;
+    height: 100%;
+}
+.addToCartButton:hover{
+    background-color:#fff;
+}
+.addToCartButton:hover svg{
+    fill:rgb(18, 18, 18);
 }
 
 @media (max-width: 768px) {

@@ -7,9 +7,67 @@ const useProductsStore = create((set, get) => ({
   products: [],
   nextUrl: null,
   prevUrl: null,
+  categories: [],
+  tags: [],
+  filters: { categories: null, tags: null, priceMin: null, priceMax: null },
+  previousFilters: { categories: null, tags: null, priceMin: null, priceMax: null },
+  fetchFilters: async () => {
+    try {
+      const tagsUrl = '/api/products/tags.json';
+      const tagsResponse = await axios.get(tagsUrl);
+      const categoriesUrl = '/api/products/categories.json';
+      const categoriesResponse = await axios.get(categoriesUrl);
+      set({
+        tags: tagsResponse.data ?? [],
+        categories: categoriesResponse.data ?? [],
+      });
+    } catch (error) {
+      console.error("Failed to fetch filters:", error.message);
+    }
+  },
+  setFilter: (filter, value) => {
+    console.log('setFilter', filter, value);
+    const currentFilters = get().filters;
+    set({ filters: { ...currentFilters, [filter]: value } });
+  },
+  removeFilter: (filter, value) => {
+    const currentFilters = get().filters;
+    const currentFilterValue = currentFilters[filter];
+    if (Array.isArray(currentFilterValue)) {
+      const newFilterValue = currentFilterValue.filter(v => v !== value);
+      set({ filters: { ...currentFilters, [filter]: newFilterValue } });
+    } else {
+      set({ filters: { ...currentFilters, [filter]: null } });
+    }
+    const { fetchWithFilters } = get();
+    fetchWithFilters();
+  },
 
-  // Fetch products from a given URL
+  fetchWithFilters: async () => {
+    const currentFilters = get().filters;
+    const previousFilters = get().previousFilters;
+    const { categories, tags, priceMin, priceMax } = currentFilters;
+    const categoriesQuery = categories ? `&category=${categories}` : '';
+    const tagsQuery = tags ? `&tags=${tags}` : '';
+    const priceMinQuery = priceMin ? `&priceMin=${priceMin}` : '';
+    const priceMaxQuery = priceMax ? `&priceMax=${priceMax}` : '';
+    const { nextUrl } = get();
+    const { fetchProducts } = get();
+    let url = '/api/products/get.json?limit=10';
+    if (currentFilters !== previousFilters) {
+      set({ previousFilters: currentFilters, products: [] });
+      url = `/api/products/get.json?limit=10${categoriesQuery}${tagsQuery}${priceMinQuery}${priceMaxQuery}`;
+    } else { 
+      url = `${nextUrl}${categoriesQuery}${tagsQuery}${priceMinQuery}${priceMaxQuery}`;
+    }
+    fetchProducts(url);
+  },
 
+  resetFilters: () => {
+    const { fetchWithFilters } = get();
+    set({ filters: { categories: null, tags: null, priceMin: null, priceMax: null } });
+    fetchWithFilters();
+  },
   fetchProducts: async (url) => {
     const currentProducts = get().products;
     try {
@@ -26,15 +84,11 @@ const useProductsStore = create((set, get) => ({
 
   // Load initial products
   loadInitialProducts: () => {
-    get().fetchProducts('/api/products.json?limit=10');
+    get().fetchProducts('/api/products/get.json?limit=10');
   },
-
   // Handlers for pagination
   fetchNext: () => {
-    const { nextUrl, fetchProducts } = get();
-    if (nextUrl) {
-      fetchProducts(nextUrl);
-    }
+    fetchWithFilters();
   },
   
   fetchPrevious: () => {
