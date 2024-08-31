@@ -127,6 +127,7 @@ export const POST: APIRoute = async ({ params, request }) => {
       }
     );
   } catch (e) {
+    console.dir(e);
     if (e.message === "Invalid email address: ") {
       return new Response(
         JSON.stringify({

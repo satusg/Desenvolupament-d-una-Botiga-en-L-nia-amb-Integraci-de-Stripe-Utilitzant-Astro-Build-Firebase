@@ -61,24 +61,24 @@
     margin-top: 2.5rem;
 }
 
+
 .loadMoreButton {
-    border: 2px solid #121212; 
-    color: #121212;
-    background-color: transparent;
-    padding: 0.75rem 1.5rem;
-    border-radius: 30px; 
+    margin-top: 1rem;
+    border: 1px solid rgb(18, 18, 18);
+    color: rgb(18, 18, 18);
+    width: 100%;
+    padding: 0.5rem 0.5rem;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    transition: background-color 0.2s ease-in-out;
+}
+.loadMoreButton:hover:not(:disabled) {
+    background-color: rgb(18, 18, 18);
+    color : #fff;
 }
 
+
 .loadMoreButton:disabled {
-    background-color: #6c757d;
-    color: #fff;
     cursor: not-allowed;
 }
 
-.loadMoreButton:hover:not(:disabled) {
-    background-color: #121212; 
-    color: #fff;
-}

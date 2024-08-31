@@ -21,7 +21,7 @@
     color: rgb(18, 18, 18);
 
     width: 100%;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.5rem;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
