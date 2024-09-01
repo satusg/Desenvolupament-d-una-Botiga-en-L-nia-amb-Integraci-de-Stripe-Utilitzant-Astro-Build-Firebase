@@ -4,7 +4,6 @@
 1020  pnpm run dev -> Run the website
 1021  pnpm install firebase-admin -> install firebase-admin
 1022  pnpm astro add react -> install react 
-1023  pnpm astro add astro-icon -> install astro icons ( OPTIONAL )
 1024  pnpm astro add node -> install SSR (NODE.JS)
 
 # 06/07/2024 para fer servir @/components/Card.astro per exemple... etc...

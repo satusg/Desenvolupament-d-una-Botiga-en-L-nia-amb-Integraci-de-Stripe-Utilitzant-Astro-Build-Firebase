@@ -2,7 +2,7 @@ import Axios from 'axios';
 export const LogoutForm = () => { 
     const onSumbitHandler = (event) => {
         event.preventDefault();
-        Axios.post('/api/logout.json', {
+        Axios.post('/api/auth/logout.json', {
         }).then((response) => {
             if (response.status === 200) {
                 window.location.href = '/login';

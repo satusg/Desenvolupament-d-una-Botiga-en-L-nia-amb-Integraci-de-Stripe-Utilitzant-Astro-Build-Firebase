@@ -42,7 +42,7 @@ if (auth.currentUser && !auth.currentUser.isAnonymous) {
 </style>
 <Layout title="Register">
   <section slot="main">
-    <form action="api/register.json" method="post" id="registerForm">
+    <form action="api/auth/register.json" method="post" id="registerForm">
       <label for="name">Name</label>
       <input
         type="text"
